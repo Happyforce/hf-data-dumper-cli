@@ -1,0 +1,37 @@
+{
+  "name": "hf-data-dumper",
+  "version": "1.0.0",
+  "description": "CLI tool for dumping data from Public API",
+  "main": "dist/index.js",
+  "bin": {
+    "hf-dumper": "./dist/index.js"
+  },
+  "pkg": {
+    "scripts": "dist/**/*.js",
+    "assets": [],
+    "targets": ["node18-macos-x64", "node18-linux-x64", "node18-win-x64"],
+    "outputPath": "dist"
+  },
+  "scripts": {
+    "build": "npm run generate-api && tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "package": "npm run build && pkg .",
+    "generate-api": "openapi --input http://localhost:9000/api/v3/api-docs --output ./src/api/generated --name HappyforceAPI --useOptions --useUnionTypes",
+    "postpackage": "chmod +x dist/hf-data-dumper-* || true"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2",
+    "pkg": "^5.8.1",
+    "openapi-typescript-codegen": "^0.25.0"
+  }
+} 
