@@ -2,6 +2,10 @@
 
 import { Command } from 'commander';
 import { HappyforceClient } from './api';
+import { writeFileSync } from 'fs';
+import { parse as parsePath } from 'path';
+import { ExportOptions, exportStats } from './csv/export';
+import { collectData } from './utils/data-collector';
 
 const program = new Command();
 
@@ -54,8 +58,8 @@ program
   .command('score-stats')
   .description('Dump score stats')
   .requiredOption('-s, --score-id <id>', 'Score ID to fetch stats for')
-  .option('-f, --from <date>', 'Start date (YYYY-MM-DD)')
-  .option('-t, --to <date>', 'End date (YYYY-MM-DD)')
+  .option('-f, --from <date>', 'Start date (ddMMyyyy format)')
+  .option('-t, --to <date>', 'End date (ddMMyyyy format)')
   .option('--hierarchy <id>', 'Filter by hierarchy ID')
   .option('--profile <profile>', 'Filter by profile')
   .option('--group <ids...>', 'Filter by group IDs')
@@ -80,8 +84,8 @@ program
 program
   .command('enps-stats')
   .description('Dump eNPS (Employee Net Promoter Score) stats')
-  .option('-f, --from <date>', 'Start date (YYYY-MM-DD)')
-  .option('-t, --to <date>', 'End date (YYYY-MM-DD)')
+  .option('-f, --from <date>', 'Start date (ddMMyyyy format)')
+  .option('-t, --to <date>', 'End date (ddMMyyyy format)')
   .option('--hierarchy <id>', 'Filter by hierarchy ID')
   .option('--profile <profile>', 'Filter by profile')
   .option('--group <ids...>', 'Filter by group IDs')
@@ -105,8 +109,8 @@ program
 program
   .command('hi-stats')
   .description('Dump HI (Happiness Index) stats')
-  .option('-f, --from <date>', 'Start date (YYYY-MM-DD)')
-  .option('-t, --to <date>', 'End date (YYYY-MM-DD)')
+  .option('-f, --from <date>', 'Start date (ddMMyyyy format)')
+  .option('-t, --to <date>', 'End date (ddMMyyyy format)')
   .option('--hierarchy <id>', 'Filter by hierarchy ID')
   .option('--profile <profile>', 'Filter by profile')
   .option('--group <ids...>', 'Filter by group IDs')
@@ -123,6 +127,46 @@ program
       console.log(JSON.stringify(stats, null, 2));
     } catch (error) {
       console.error('Error fetching HI stats:', error);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('export')
+  .description('Export stats data to CSV')
+  .option('--hi', 'Export Happiness Index stats')
+  .option('--enps', 'Export eNPS stats')
+  .option('--score-id <id>', 'Export specific score stats')
+  .option('--scores', 'Export all scores stats')
+  .requiredOption('--from <date>', 'Start date (ddMMyyyy format)')
+  .requiredOption('--to <date>', 'End date (ddMMyyyy format)')
+  .option('--hierarchies', 'Export data by hierarchies')
+  .option('--groups', 'Export data by groups')
+  .option('--segments', 'Export data by segments')
+  .option('-o, --output <file>', 'Output file path (defaults to export_YYYYMMDD.csv)')
+  .action(async (options: ExportOptions) => {
+    const client = new HappyforceClient(program.opts().apiKey);
+    
+    try {
+      // Validate that at least one stat type is selected
+      if (!options.hi && !options.enps && !options.scoreId && !options.scores) {
+        throw new Error('Please specify at least one stat type to export (--hi, --enps, --score-id, or --scores)');
+      }
+
+      // Can't use both --score-id and --scores
+      if (options.scoreId && options.scores) {
+        throw new Error('Cannot use both --score-id and --scores options together');
+      }
+
+      // Validate that at least one grouping is selected
+      if (!options.hierarchies && !options.groups && !options.segments) {
+        throw new Error('Please specify at least one grouping method (--hierarchies, --groups, or --segments)');
+      }
+
+      const results = await collectData(client, options);
+      await exportStats(results, options);
+    } catch (error) {
+      console.error('Error exporting data:', error);
       process.exit(1);
     }
   });

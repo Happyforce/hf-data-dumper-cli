@@ -12,6 +12,7 @@ src/api/generated/
 .env.*
 
 # IDE files
+.vscode
 .vscode/
 .idea/
 
