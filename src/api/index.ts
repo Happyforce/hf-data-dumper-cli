@@ -1,5 +1,5 @@
 export * from './generated';
-import { ApiError, OpenAPI, HappyforceAPI } from './generated';
+import {  OpenAPI, HappyforceAPI } from './generated';
 
 export class HappyforceClient {
   private client: HappyforceAPI;
