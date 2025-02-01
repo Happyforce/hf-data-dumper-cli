@@ -1,3 +1,5 @@
+[![Release](https://github.com/Happyforce/hf-data-dumper-cli/actions/workflows/release.yml/badge.svg)](https://github.com/Happyforce/hf-data-dumper-cli/actions/workflows/release.yml)
+
 # Happyforce Data Dumper CLI
 
 Command-line tool for exporting data from Happyforce Public API in CSV format. Export your company's HI (Happiness Index), eNPS (Employee Net Promoter Score), and Score metrics with support for hierarchies, groups, and segments.
