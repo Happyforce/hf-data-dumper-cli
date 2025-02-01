@@ -1,4 +1,5 @@
-import { writeFileSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { dirname } from 'path';
 import { ENPSStats } from '../api/generated/models/ENPSStats';
 import { HIStats } from '../api/generated/models/HIStats';
 import { ScoreStats } from '../api/generated/models/ScoreStats';
@@ -221,34 +222,47 @@ class CSVGenerators {
 const csvGenerators = new CSVGenerators();
 
 export async function exportStats(results: CollectedData, options: ExportOptions) {
-  const baseFileName = options.output?.replace('.csv', '') || `export_${new Date().toISOString().split('T')[0].replace(/-/g, '')}`;
+  const baseFileName = options.output?.replace('.csv', '') || `dumps/export_${new Date().toISOString().split('T')[0].replace(/-/g, '')}`;
+
+  // Ensure dumps directory exists
+  const dir = dirname(baseFileName);
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
+  }
 
   if (options.hi) {
+    console.log('Exporting HI stats...');
     const hiData = csvGenerators.generateHiCSV(results.dimensions);
     writeFileSync(`${baseFileName}_hi.csv`, hiData);
-    console.log(`HI stats exported to ${baseFileName}_hi.csv`);
+    console.log(`✓ HI stats exported to ${baseFileName}_hi.csv`);
   }
 
   if (options.enps) {
+    console.log('Exporting eNPS stats...');
     const enpsData = csvGenerators.generateEnpsCSV(results.dimensions);
     writeFileSync(`${baseFileName}_enps.csv`, enpsData);
-    console.log(`eNPS stats exported to ${baseFileName}_enps.csv`);
+    console.log(`✓ eNPS stats exported to ${baseFileName}_enps.csv`);
   }
 
   if (options.scores && results.scoresInfo) {
     // Main scores stats
+    console.log('Exporting scores main stats...');
     const scoresData = csvGenerators.generateScoresMainCSV(results.dimensions, results.scoresInfo);
     writeFileSync(`${baseFileName}_scores.csv`, scoresData);
-    console.log(`All scores stats exported to ${baseFileName}_scores.csv`);
+    console.log(`✓ All scores stats exported to ${baseFileName}_scores.csv`);
 
     // All factors stats
+    console.log('Exporting scores factors...');
     const factorsData = csvGenerators.generateScoresFactorsCSV(results.dimensions, results.scoresInfo);
     writeFileSync(`${baseFileName}_scores_factors.csv`, factorsData);
-    console.log(`All scores factors exported to ${baseFileName}_scores_factors.csv`);
+    console.log(`✓ All scores factors exported to ${baseFileName}_scores_factors.csv`);
 
     // All questions results
+    console.log('Exporting scores questions...');
     const questionsData = csvGenerators.generateScoresQuestionsCSV(results.dimensions, results.scoresInfo);
     writeFileSync(`${baseFileName}_scores_questions.csv`, questionsData);
-    console.log(`All scores questions exported to ${baseFileName}_scores_questions.csv`);
+    console.log(`✓ All scores questions exported to ${baseFileName}_scores_questions.csv`);
   }
+
+  console.log('Export completed!');
 } 

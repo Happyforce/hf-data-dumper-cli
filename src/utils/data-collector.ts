@@ -121,6 +121,7 @@ async function getStats(client: HappyforceClient, options: ExportOptions, dimens
 
   if (options.hi) {
     try {
+      process.stdout.write('.');
       stats.hi = await client.api.stats.getCompanyHiStats(params);
     } catch (error: any) {
       if (error?.body?.errorCode === 'NOT_ENOUGH_ACTIVE_EMPLOYEES') {
@@ -133,6 +134,7 @@ async function getStats(client: HappyforceClient, options: ExportOptions, dimens
   
   if (options.enps) {
     try {
+      process.stdout.write('.');
       stats.enps = await client.api.stats.getCompanyEnpsStats(params);
     } catch (error: any) {
       if (error?.body?.errorCode === 'NOT_ENOUGH_ACTIVE_EMPLOYEES') {
@@ -165,6 +167,7 @@ async function getStats(client: HappyforceClient, options: ExportOptions, dimens
     for (const scoreInfo of allScores) {
       if (!scoreInfo.id) continue;
       try {
+        process.stdout.write('.');
         stats.scores[scoreInfo.id] = await client.api.stats.getCompanyScoreStats({
           ...params,
           scoreId: scoreInfo.id
