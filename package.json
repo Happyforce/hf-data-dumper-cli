@@ -12,7 +12,9 @@
   },
   "pkg": {
     "scripts": "dist/**/*.js",
-    "assets": [],
+    "assets": [
+      "node_modules/**/*"
+    ],
     "targets": ["node18-macos-x64", "node18-linux-x64", "node18-win-x64"],
     "outputPath": "dist"
   },
@@ -20,7 +22,7 @@
     "build": "npm run generate-api && tsc",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
-    "package": "npm run build && pkg .",
+    "package": "npm run build && pkg . --debug",
     "generate-api": "openapi --input https://api.myhappyforce.com/api/v3/api-docs --output ./src/api/generated --name HappyforceAPI --useOptions --useUnionTypes",
     "postpackage": "chmod +x dist/hf-data-dumper-* || true"
   },
