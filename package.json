@@ -21,7 +21,7 @@
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
     "package": "npm run build && pkg .",
-    "generate-api": "openapi --input https://api.happyforce.com/api/v3/api-docs --output ./src/api/generated --name HappyforceAPI --useOptions --useUnionTypes",
+    "generate-api": "openapi --input https://api.myhappyforce.com/api/v3/api-docs --output ./src/api/generated --name HappyforceAPI --useOptions --useUnionTypes",
     "postpackage": "chmod +x dist/hf-data-dumper-* || true"
   },
   "keywords": [],
