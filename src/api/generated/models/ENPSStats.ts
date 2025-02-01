@@ -3,10 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ENPSStatsDateResultPublicDTO } from './ENPSStatsDateResultPublicDTO';
+import type { ENPSStatsDateResult } from './ENPSStatsDateResult';
 
 /**
- * Self contained model that contains the stats during a period for the eNPS
+ * Contains the ENPS stats during a period for a given. It contains on the root of the object the last result, and on the dateResults field, the results for a given period
  */
 export type ENPSStats = {
     /**
@@ -30,9 +30,13 @@ export type ENPSStats = {
      */
     participants?: number;
     /**
+     * The expected participants
+     */
+    expectedParticipants?: number;
+    /**
      * Results by date for the given score. (for each iteration requested)
      */
-    dateResults?: Array<ENPSStatsDateResultPublicDTO>;
+    dateResults?: Array<ENPSStatsDateResult>;
     /**
      * Number of detractors
      */

@@ -88,67 +88,13 @@ class CSVGenerators {
     return rows.join('\n');
   }
 
-  generateScoreCSV(data: Array<ScoreCSVData>, scoreInfo: Score) {
+  generateScoresMainCSV(data: Array<ScoresCSVData>, scoresInfo: Score[]) {
     const headers = [
       'Dimension ID',
       'Dimension Type',
       'Dimension',
-      'Score Type',
-      `${scoreInfo.name} Value`,
-      'Participants',
-      'Quality',
-      'Valuation',
-      ...(scoreInfo.factors?.map(f => f.name) ?? [])
-    ];
-    const rows = [headers.join(',')];
-
-    for (const item of data) {
-      // Main score row
-      rows.push([
-        item.dimension.id,
-        item.dimension.type,
-        item.dimension.name,
-        'Score',
-        String(item.stats.score?.result ?? ''),
-        String(item.stats.score?.participants ?? ''),
-        String(item.stats.score?.quality ?? ''),
-        String(item.stats.score?.valuation ?? ''),
-        ...(scoreInfo.factors?.map(() => '') ?? []) // Empty factor columns
-      ].join(','));
-
-      // Factor rows
-      item.stats.score?.factors?.forEach(factorStats => {
-        const factorInfo = scoreInfo.factors?.find(f => f.id === factorStats.factorId);
-        if (!factorInfo) return;
-
-        const factorValues = scoreInfo.factors?.map(f => 
-          f.id === factorStats.factorId ? String(factorStats.result ?? '') : ''
-        ) ?? [];
-
-        rows.push([
-          item.dimension.id,
-          item.dimension.type,
-          item.dimension.name,
-          `Factor: ${factorInfo.name}`,
-          String(factorStats.result ?? ''),
-          String(factorStats.participants ?? ''),
-          String(factorStats.quality ?? ''),
-          String(factorStats.valuation ?? ''),
-          ...factorValues
-        ].join(','));
-      });
-    }
-
-    return rows.join('\n');
-  }
-
-  generateScoresCSV(data: Array<ScoresCSVData>, scoresInfo: Score[]) {
-    const headers = [
-      'Dimension ID',
-      'Dimension Type',
-      'Dimension',
+      'Score ID',
       'Score Name',
-      'Score Type',
       'Score Value',
       'Participants',
       'Quality',
@@ -160,23 +106,49 @@ class CSVGenerators {
       for (const scoreInfo of scoresInfo) {
         if (!scoreInfo.id) continue;
         const scoreStats = item.stats.scores?.[scoreInfo.id];
-        if (!scoreStats) continue;
+        const dateResults = scoreStats?.dateResults?.[0];
+        if (!dateResults) continue;
 
-        // Main score row
         rows.push([
           item.dimension.id,
           item.dimension.type,
           item.dimension.name,
+          scoreInfo.id,
           scoreInfo.name,
-          'Score',
-          String(scoreStats.result ?? ''),
-          String(scoreStats.participants ?? ''),
-          String(scoreStats.quality ?? ''),
-          String(scoreStats.valuation ?? '')
+          String(dateResults.result ?? ''),
+          String(dateResults.participants ?? ''),
+          String(dateResults.quality ?? ''),
+          String(dateResults.valuation ?? '')
         ].join(','));
+      }
+    }
 
-        // Factor rows
-        scoreStats.factors?.forEach(factorStats => {
+    return rows.join('\n');
+  }
+
+  generateScoresFactorsCSV(data: Array<ScoresCSVData>, scoresInfo: Score[]) {
+    const headers = [
+      'Dimension ID',
+      'Dimension Type',
+      'Dimension',
+      'Score ID',
+      'Factor ID',
+      'Factor Name',
+      'Factor Value',
+      'Participants',
+      'Quality',
+      'Valuation'
+    ];
+    const rows = [headers.join(',')];
+
+    for (const item of data) {
+      for (const scoreInfo of scoresInfo) {
+        if (!scoreInfo.id) continue;
+        const scoreStats = item.stats.scores?.[scoreInfo.id];
+        const dateResults = scoreStats?.dateResults?.[0];
+        if (!dateResults) continue;
+
+        dateResults.factors?.forEach(factorStats => {
           const factorInfo = scoreInfo.factors?.find(f => f.id === factorStats.factorId);
           if (!factorInfo) return;
 
@@ -184,13 +156,60 @@ class CSVGenerators {
             item.dimension.id,
             item.dimension.type,
             item.dimension.name,
-            scoreInfo.name,
-            `Factor: ${factorInfo.name}`,
+            scoreInfo.id,
+            factorInfo.id,
+            factorInfo.name,
             String(factorStats.result ?? ''),
             String(factorStats.participants ?? ''),
             String(factorStats.quality ?? ''),
             String(factorStats.valuation ?? '')
           ].join(','));
+        });
+      }
+    }
+
+    return rows.join('\n');
+  }
+
+  generateScoresQuestionsCSV(data: Array<ScoresCSVData>, scoresInfo: Score[]) {
+    const headers = [
+      'Dimension ID',
+      'Dimension Type',
+      'Dimension',
+      'Score ID',
+      'Factor ID',
+      'Question ID',
+      'Question Title',
+      'Question Value',
+      'Participants'
+    ];
+    const rows = [headers.join(',')];
+
+    for (const item of data) {
+      for (const scoreInfo of scoresInfo) {
+        if (!scoreInfo.id) continue;
+        const scoreStats = item.stats.scores?.[scoreInfo.id];
+        const dateResults = scoreStats?.dateResults?.[0];
+        if (!dateResults) continue;
+
+        dateResults.factors?.forEach(factorStats => {
+          const factorInfo = scoreInfo.factors?.find(f => f.id === factorStats.factorId);
+          if (!factorInfo) return;
+
+          factorStats.questions?.forEach(question => {
+            const questionInfo = factorInfo.questions?.find(q => q.id === question.questionId);
+            rows.push([
+              item.dimension.id,
+              item.dimension.type,
+              item.dimension.name,
+              scoreInfo.id,
+              factorStats.factorId,
+              question.questionId,
+              questionInfo?.title ?? '',
+              String(question.result ?? ''),
+              String(question.participants ?? '')
+            ].join(','));
+          });
         });
       }
     }
@@ -216,15 +235,20 @@ export async function exportStats(results: CollectedData, options: ExportOptions
     console.log(`eNPS stats exported to ${baseFileName}_enps.csv`);
   }
 
-  if (options.scoreId && results.scoresInfo) {
-    const scoreData = csvGenerators.generateScoreCSV(results.dimensions, results.scoresInfo[0]);
-    writeFileSync(`${baseFileName}_score.csv`, scoreData);
-    console.log(`Score stats exported to ${baseFileName}_score.csv`);
-  }
-
   if (options.scores && results.scoresInfo) {
-    const scoresData = csvGenerators.generateScoresCSV(results.dimensions, results.scoresInfo);
+    // Main scores stats
+    const scoresData = csvGenerators.generateScoresMainCSV(results.dimensions, results.scoresInfo);
     writeFileSync(`${baseFileName}_scores.csv`, scoresData);
     console.log(`All scores stats exported to ${baseFileName}_scores.csv`);
+
+    // All factors stats
+    const factorsData = csvGenerators.generateScoresFactorsCSV(results.dimensions, results.scoresInfo);
+    writeFileSync(`${baseFileName}_scores_factors.csv`, factorsData);
+    console.log(`All scores factors exported to ${baseFileName}_scores_factors.csv`);
+
+    // All questions results
+    const questionsData = csvGenerators.generateScoresQuestionsCSV(results.dimensions, results.scoresInfo);
+    writeFileSync(`${baseFileName}_scores_questions.csv`, questionsData);
+    console.log(`All scores questions exported to ${baseFileName}_scores_questions.csv`);
   }
 } 

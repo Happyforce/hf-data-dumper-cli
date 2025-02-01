@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { HIStatsDate } from './HIStatsDate';
 import type { QuestionValue } from './QuestionValue';
 
 /**
@@ -26,12 +27,16 @@ export type HIStats = {
      */
     participants?: number;
     /**
+     * Number of expected participants on the period
+     */
+    expectedParticipants?: number;
+    /**
      * HI of the given period
      */
     periodIndex?: number;
     /**
      * HI by date given period
      */
-    dailyIndex?: Record<string, number>;
+    dateResults?: Array<HIStatsDate>;
 };
 

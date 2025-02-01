@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FactorDTO } from './FactorDTO';
+import type { ScoreFactor } from './ScoreFactor';
 
 /**
  * Self contained model that contains the metadata for a given score
@@ -25,6 +25,6 @@ export type Score = {
     /**
      * Factors that compose this score
      */
-    factors?: Array<FactorDTO>;
+    factors?: Array<ScoreFactor>;
 };
 

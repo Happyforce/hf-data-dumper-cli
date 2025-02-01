@@ -7,7 +7,7 @@ import type { ScoreFactorStats } from './ScoreFactorStats';
 import type { ScoreStatsDateResult } from './ScoreStatsDateResult';
 
 /**
- * Self contained model that contains the stats during a period for a given score
+ * Contains a Score stats during a period for a given. It contains on the root of the object the last result, and on the dateResults field, the results for a given period
  */
 export type ScoreStats = {
     scoreId?: string;
@@ -27,6 +27,10 @@ export type ScoreStats = {
      * The unique participants
      */
     participants?: number;
+    /**
+     * The expected participants
+     */
+    expectedParticipants?: number;
     /**
      * Results by date for the given score. (for each iteration requested)
      */

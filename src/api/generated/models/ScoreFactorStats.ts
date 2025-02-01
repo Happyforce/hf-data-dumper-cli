@@ -3,8 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ScoreQuestionStats } from './ScoreQuestionStats';
+
 /**
- * Self contained model that contains the metadata for a given score
+ * Self contained model that contains the results for a given score factor
  */
 export type ScoreFactorStats = {
     factorId?: string;
@@ -28,5 +30,9 @@ export type ScoreFactorStats = {
      * Valuation of the factor
      */
     valuation?: 'NO_DATA' | 'BAD' | 'WARNING' | 'NEUTRAL' | 'GOOD' | 'EXCELLENT';
+    /**
+     * Questions used to compute the factor result
+     */
+    questions?: Array<ScoreQuestionStats>;
 };
 

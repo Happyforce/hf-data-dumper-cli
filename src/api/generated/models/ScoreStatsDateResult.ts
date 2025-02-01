@@ -6,7 +6,7 @@
 import type { ScoreFactorStats } from './ScoreFactorStats';
 
 /**
- * Self contained model that contains the metadata for a given score
+ * Self contained model that contains the results for a given score
  */
 export type ScoreStatsDateResult = {
     /**
@@ -17,6 +17,10 @@ export type ScoreStatsDateResult = {
      * The unique participants
      */
     participants?: number;
+    /**
+     * The expected participants
+     */
+    expectedParticipants?: number;
     /**
      * Result for the given score on that period
      */
