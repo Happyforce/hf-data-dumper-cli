@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/hf-data-dumper"
+    "url": "https://github.com/happyforce/hf-data-dumper-cli"
   },
-  "description": "CLI tool for dumping data from Public API",
+  "description": "CLI tool for dumping data from Public Happyforce API",
   "main": "dist/index.js",
   "bin": {
     "hf-dumper": "./dist/index.js"
@@ -21,7 +21,7 @@
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
     "package": "npm run build && pkg .",
-    "generate-api": "openapi --input http://api.happyforce.com/api/v3/api-docs --output ./src/api/generated --name HappyforceAPI --useOptions --useUnionTypes",
+    "generate-api": "openapi --input https://api.happyforce.com/api/v3/api-docs --output ./src/api/generated --name HappyforceAPI --useOptions --useUnionTypes",
     "postpackage": "chmod +x dist/hf-data-dumper-* || true"
   },
   "keywords": [],
