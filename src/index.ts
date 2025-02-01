@@ -6,6 +6,7 @@ import { writeFileSync } from 'fs';
 import { parse as parsePath } from 'path';
 import { ExportOptions, exportStats } from './csv/export';
 import { collectData } from './utils/data-collector';
+import { checkForUpdates, updateTool } from './utils/update-checker';
 
 const program = new Command();
 
@@ -14,6 +15,11 @@ program
   .description('CLI tool for dumping data from Public API')
   .version('1.0.0')
   .requiredOption('-k, --api-key <key>', 'API key for authentication');
+
+program
+  .command('update')
+  .description('Update to the latest version')
+  .action(updateTool);
 
 program
   .command('employees')
@@ -170,5 +176,10 @@ program
       process.exit(1);
     }
   });
+
+// Check for updates on every run (except update command)
+if (process.argv[2] !== 'update') {
+  checkForUpdates();
+}
 
 program.parse(); 
