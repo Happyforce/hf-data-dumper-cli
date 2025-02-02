@@ -37,7 +37,6 @@ jobs:
             dist/hf-data-dumper-win.exe
           draft: false
           prerelease: false
-          body: "Binary releases for hf-data-dumper"
-          generate_release_notes: false
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
