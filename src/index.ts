@@ -140,23 +140,27 @@ program
 program
   .command('export')
   .description('Export stats data to CSV')
-  .option('--hi', 'Export Happiness Index stats')
-  .option('--enps', 'Export eNPS stats')
-  .option('--score-id <id>', 'Export specific score stats')
-  .option('--scores', 'Export all scores stats')
   .requiredOption('--from <date>', 'Start date (ddMMyyyy format)')
   .requiredOption('--to <date>', 'End date (ddMMyyyy format)')
-  .option('--hierarchies', 'Export data by hierarchies')
-  .option('--groups', 'Export data by groups')
-  .option('--segments', 'Export data by segments')
-  .option('-o, --output <file>', 'Output file path (defaults to export_YYYYMMDD.csv)')
+  .option('--hi', 'Export HI stats')
+  .option('--enps', 'Export eNPS stats')
+  .option('--participation', 'Export participation stats')
+  .option('--activation', 'Export activation stats')
+  .option('--scores', 'Export all scores stats')
+  .option('--score-id <id>', 'Export specific score stats')
+  .option('--hierarchies', 'Include hierarchies')
+  .option('--groups', 'Include groups')
+  .option('--segments', 'Include segments')
+  .option('--output <file>', 'Output file name')
   .action(async (options: ExportOptions) => {
     const client = new HappyforceClient(program.opts().apiKey);
+  
+
     
     try {
       // Validate that at least one stat type is selected
-      if (!options.hi && !options.enps && !options.scoreId && !options.scores) {
-        throw new Error('Please specify at least one stat type to export (--hi, --enps, --score-id, or --scores)');
+      if (!options.hi && !options.enps && !options.scoreId && !options.scores && !options.participation && !options.activation) {
+        throw new Error('Please specify at least one stat type to export (--hi, --enps, --score-id, --scores, --participation, or --activation)');
       }
 
       // Can't use both --score-id and --scores

@@ -7,7 +7,7 @@ import type { ScoreFactorStats } from './ScoreFactorStats';
 import type { ScoreStatsDateResult } from './ScoreStatsDateResult';
 
 /**
- * Contains a Score stats during a period for a given. It contains on the root of the object the last result, and on the dateResults field, the results for a given period
+ * Contains a Score stats during a period for a given period. It contains on the root of the object the last result, and on the dateResults field, the results for a given period
  */
 export type ScoreStats = {
     scoreId?: string;

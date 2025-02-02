@@ -5,10 +5,14 @@ import { HIStats } from '../api/generated/models/HIStats';
 import { ScoreStats } from '../api/generated/models/ScoreStats';
 import { Score } from '../api/generated/models/Score';
 import { CollectedData } from '../utils/data-collector';
+import { Activation_Stats } from '../api/generated/models/Activation_Stats';
+import { Participation_Stats } from '../api';
 
 export interface ExportOptions {
   hi?: boolean;
   enps?: boolean;
+  participation?: boolean;
+  activation?: boolean;
   scoreId?: string;
   scores?: boolean;
   from: string;
@@ -217,6 +221,60 @@ class CSVGenerators {
 
     return rows.join('\n');
   }
+
+  generateParticipationCSV(data: Array<{ 
+    dimension: { name: string, id: string, type: string }, 
+    stats: { participation?: Participation_Stats } 
+  }>) {
+    const headers = [
+      'Dimension ID',
+      'Dimension Type',
+      'Dimension',
+      'Participants',
+      'Lost Participants',
+      'New Participants'
+    ];
+    const rows = [headers.join(',')];
+
+    for (const item of data) {
+      rows.push([
+        item.dimension.id,
+        item.dimension.type,
+        item.dimension.name,
+        String(item.stats.participation?.participants ?? ''),
+        String(item.stats.participation?.lostParticipants ?? ''),
+        String(item.stats.participation?.newParticipants ?? '')
+      ].join(','));
+    }
+
+    return rows.join('\n');
+  }
+
+  generateActivationCSV(data: Array<{ 
+    dimension: { name: string, id: string, type: string }, 
+    stats: { activation?: Activation_Stats } 
+  }>) {
+    const headers = [
+      'Dimension ID',
+      'Dimension Type',
+      'Dimension',
+      'Total Activated',
+      'Total Invited'
+    ];
+    const rows = [headers.join(',')];
+
+    for (const item of data) {
+      rows.push([
+        item.dimension.id,
+        item.dimension.type,
+        item.dimension.name,
+        String(item.stats.activation?.totalActivated ?? ''),
+        String(item.stats.activation?.totalInvited ?? ''),
+      ].join(','));
+    }
+
+    return rows.join('\n');
+  }
 }
 
 const csvGenerators = new CSVGenerators();
@@ -262,6 +320,20 @@ export async function exportStats(results: CollectedData, options: ExportOptions
     const questionsData = csvGenerators.generateScoresQuestionsCSV(results.dimensions, results.scoresInfo);
     writeFileSync(`${baseFileName}_scores_questions.csv`, questionsData);
     console.log(`✓ All scores questions exported to ${baseFileName}_scores_questions.csv`);
+  }
+
+  if (options.participation) {
+    console.log('Exporting participation stats...');
+    const participationData = csvGenerators.generateParticipationCSV(results.dimensions);
+    writeFileSync(`${baseFileName}_participation.csv`, participationData);
+    console.log(`✓ Participation stats exported to ${baseFileName}_participation.csv`);
+  }
+
+  if (options.activation) {
+    console.log('Exporting activation stats...');
+    const activationData = csvGenerators.generateActivationCSV(results.dimensions);
+    writeFileSync(`${baseFileName}_activation.csv`, activationData);
+    console.log(`✓ Activation stats exported to ${baseFileName}_activation.csv`);
   }
 
   console.log('Export completed!');

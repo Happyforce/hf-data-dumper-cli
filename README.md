@@ -36,6 +36,16 @@ Export eNPS stats:
 bash
 hf-dumper -k YOUR_API_KEY --enps --from 2023-01-01 --to 2023-12-31
 
+Export participation stats:
+
+bash
+hf-dumper -k YOUR_API_KEY --participation --from 2023-01-01 --to 2023-12-31
+
+Export activation stats:
+
+bash
+hf-dumper -k YOUR_API_KEY --activation --from 2023-01-01 --to 2023-12-31
+
 Export all scores:
 
 bash

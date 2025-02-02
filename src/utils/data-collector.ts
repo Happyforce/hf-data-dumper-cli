@@ -1,6 +1,7 @@
 import { HappyforceClient, Score } from '../api';
 import { ExportOptions } from '../csv/export';
 
+
 export interface CollectedData {
   dimensions: Array<{
     dimension: any;
@@ -11,7 +12,7 @@ export interface CollectedData {
 
 export async function collectData(client: HappyforceClient, options: ExportOptions): Promise<CollectedData> {
   const dimensions: any[] = [];
-  
+
   // Get all hierarchies/groups/segments first
   const dimensionsList = await getDimensions(client, options);
   
@@ -63,6 +64,12 @@ function flattenSegments(characteristics: any[]): any[] {
 
 async function getDimensions(client: HappyforceClient, options: ExportOptions) {
   const dimensions: any[] = [];
+
+  dimensions.push({
+    id: 'all',
+    type: 'all',
+    name: 'All Company'
+  });
   
   if (options.hierarchies) {
     const hierarchy = await client.api.segmentation.getHierarchy();
@@ -114,10 +121,11 @@ async function getStats(client: HappyforceClient, options: ExportOptions, dimens
   const params = {
     from: options.from,
     to: options.to,
-    hierarchyId: options.hierarchies ? dimension.id : undefined,
-    groupId: options.groups ? [dimension.id] : undefined,
-    profile: options.segments ? dimension.id : undefined
+    hierarchyId: options.hierarchies && dimension.id !== 'all' ? dimension.id : undefined,
+    groupId: options.groups && dimension.id !== 'all' ? [dimension.id] : undefined,
+    profile: options.segments && dimension.id !== 'all' ? dimension.id : undefined
   };
+
 
   if (options.hi) {
     try {
@@ -181,6 +189,33 @@ async function getStats(client: HappyforceClient, options: ExportOptions, dimens
       }
     }
   }
+
+  if (options.activation) {
+    try {
+      process.stdout.write('.');
+      stats.activation = await client.api.stats.getCompanyActivationStats(params);
+    } catch (error: any) {
+      if (error?.body?.errorCode === 'NOT_ENOUGH_ACTIVE_EMPLOYEES') {
+        stats.activation = { totalActivated: '-', totalInvited: '-' };
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  if (options.participation) {
+    try {
+      process.stdout.write('.');
+      stats.participation = await client.api.stats.getCompanyParticipationStats(params);
+    } catch (error: any) {
+      if (error?.body?.errorCode === 'NOT_ENOUGH_ACTIVE_EMPLOYEES') {
+        stats.participation = { participants: '-', lostParticipants: '-', newParticipants: '-' };
+      } else {
+        throw error;
+      }
+    }
+  }
+
   return stats;
 }
 

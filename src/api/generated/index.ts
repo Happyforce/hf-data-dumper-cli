@@ -10,6 +10,8 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
+export type { Activation_Stats } from './models/Activation_Stats';
+export type { ActivationStatsDateResultPublicDTO } from './models/ActivationStatsDateResultPublicDTO';
 export type { Area } from './models/Area';
 export type { Employee } from './models/Employee';
 export type { EmployeeProfile } from './models/EmployeeProfile';
@@ -20,6 +22,8 @@ export type { Group } from './models/Group';
 export type { HIStats } from './models/HIStats';
 export type { HIStatsDate } from './models/HIStatsDate';
 export type { MultiLanguage } from './models/MultiLanguage';
+export type { Participation_Stats } from './models/Participation_Stats';
+export type { ParticipationDateResultDTO } from './models/ParticipationDateResultDTO';
 export type { Profile } from './models/Profile';
 export type { ProfileValue } from './models/ProfileValue';
 export type { QuestionValue } from './models/QuestionValue';
